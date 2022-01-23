@@ -1,8 +1,8 @@
 ##CARA INSTALL MELALUI GIT
 
 > pkg install git
-> gitclone https://github.com/ItsAraZ/Arabot
-> cd arabot
+> gitclone https://github.com/yannngithub/botku
+> cd botku
 > bash install.sh
 > npm start
 > scan qr
