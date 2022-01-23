@@ -1,5 +1,5 @@
 {
-  "name": "arabot",
+  "name": "yannnbot",
   "version": "1.0.0",
   "description": "Chika for whatsapp online with termux",
   "main": "index.js",
@@ -17,15 +17,15 @@
     "whatsapp",
     "bot"
   ],
-  "author": "Ara",
+  "author": "Yannn",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/alonecans/wansap-bot-manca.git"
+    "url": "git+https://github.com/yannngithub/botku.git"
   },
   "bugs": {
     "url": "https://github.com/alonecans/wansap-bot-manca/issues"
   },
-  "homepage": "https://github.com/alonecans/readme.md",
+  "homepage": "https://github.com/yannngithub/botku/blob/main/README.md",
   "license": "ISC",
   "dependencies": {
     "@adiwajshing/baileys": "^3.5.3",
