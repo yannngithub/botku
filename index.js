@@ -68,6 +68,8 @@ const {
  xteamapi = 'a781ec5cc8d2e966'
  dapapi = 'alvianto'
  zahirapi = 'zahirgans'
+ zeksapi = 'apivinz'
+ alphaapi = 'Alphabot'
  /******** OWNER NUMBER**********/
  
  const ownerNumber = ["62895401223315@s.whatsapp.net"]   //ganti nomor kamu sayang
@@ -285,7 +287,7 @@ const {
  
  const client = new WAConnection()
  //WWEB 
- client.version = [2, 2147, 16]
+client.version = [2, 2149, 4]
     client.on('qr', qr => {
     qrcode.generate(qr, { small: true })
     console.log(color('[','white'),color('∆','red'),color(']','white'),color('QR code is ready, Scan now...','white'),color('Y A N','red'),color('X','lime'),color('LolHuman','red'))
@@ -560,7 +562,7 @@ const {
              }
  
              mess = {
-                 wait: '```[ ! ] Tunggu Bentar Tod...```',
+                 wait: '```[ ! ] Tunggu Bentar...```',
                  success: '```Done Stah```',
                  error: {
                   bug: '```An Error Occurred Try Contacting Owner To Report Error```',
@@ -1164,7 +1166,8 @@ const {
                  case 'nobadword':
                      if (!isOwner) return reply(mess.only.ownerB)
                      if (!isGroupAdmins) return reply(mess.only.admin)
-                     if (args.length < 1) return reply('Pa Maksud?')
+                     if (!isBotGroupAdmins) return reply(mess.only.Badmin)
+                     if (args.length < 1) return reply('enable/disable')
                      if (args[0] === 'enable') {
                      if (isBadWord) return reply('*fitur BadWord sudah aktif tadi!!*')
                      badword.push(from)
@@ -1181,6 +1184,7 @@ const {
                  case 'addbadword':
                      if (!isOwner) return reply(mess.only.ownerB)
                      if (!isGroupAdmins) return reply(mess.only.admin)
+                     if (!isBotGroupAdmins) return reply(mess.only.Badmin)
                      if (args.length < 1) return reply( `Kirim perintah ${prefix}addbadword [kata kasar]. contoh ${prefix}addbadword bego`)
                      const bw = body.slice(12)
                      bad.push(bw)
@@ -1190,6 +1194,7 @@ const {
                  case 'delbadword':
                      if (!isOwner) return reply(mess.only.ownerB)
                      if (!isGroupAdmins) return reply(mess.only.admin)
+                     if (!isBotGroupAdmins) return reply(mess.only.Badmin)
                      if (args.length < 1) return reply( `Kirim perintah ${prefix}addbadword [kata kasar]. contoh ${prefix}addbadword bego`)
                      let dbw = body.slice(12)
                      bad.splice(dbw, 1)
@@ -1267,16 +1272,14 @@ break
  case 'downloadmenu':
  reply(`╭──❲ DOWNLOAD MENU ❳
 │ ${prefix}tiktok
+│ ${prefix}play
 │ ${prefix}fb
 │ ${prefix}ig
 │ ${prefix}twit
 │ ${prefix}tiktokmusik
-│ ${prefix}play
 │ ${prefix}playvideo
 │ ${prefix}ytmp3
 │ ${prefix}ytmp4
-│ ${prefix}ytsearch
-│ ${prefix}playstore
 ╰────────────────⊱`)
  break
  
@@ -1297,10 +1300,10 @@ break
 │ ${prefix}hidetag
 │ ${prefix}add [62]
 │ ${prefix}kick [@tag]
-│ ${prefix}setname
-│ ${prefix}setdesc
-│ ${prefix}setpp
-│ ${prefix}linkgc
+│ ${prefix}setnamegrup
+│ ${prefix}setdescgrup
+│ ${prefix}setppgrup
+│ ${prefix}delete
 │ ${prefix}leave
 │ ${prefix}grup [buka/tutup]
 │ ${prefix}wa.me
@@ -1316,14 +1319,13 @@ break
 │ ${prefix}unblock
 │ ${prefix}blocklist
 │ ${prefix}bc
-│ ${prefix}del
-│ ${prefix}setreply
-│ ${prefix}kickall
+│ ${prefix}reply
+│ ${prefix}kickall (Resiko kena *BANNED*)
 │ ${prefix}clearall
-│ ${prefix}spamwa [62]
-│ ${prefix}spamsms [62]
-│ ${prefix}spamtlp [62]
-│ ${prefix}spamall [62]
+│ ${prefix}spamwa [62xxx]
+│ ${prefix}spamsms [62xxx]
+│ ${prefix}spamtlp [8xxx]
+│ ${prefix}spamall [62xxx]
 ╰────────────────⊱`)
  break
  
@@ -1348,13 +1350,9 @@ break
 ╰────────────────⊱`)
  
  case 'othermenu':
- reply(`╭──❲ OTHER, FUN & GAME MENU ❳
-│ ${prefix}lirik
-│ ${prefix}meme
-│ ${prefix}artinama
-│ ${prefix}asahotak
-│ ${prefix}tebakgambar
-│ ${prefix}caklontong
+ reply(`╭──❲ OTHER & FUN MENU ❳
+│ ${prefix}lirik   
+│ ${prefix}ppcp
 ╰────────────────⊱`)
  break
  
@@ -1402,6 +1400,7 @@ break
                      if (!isGroup) return reply(mess.only.group)
                      
                      if (!isGroupAdmins) return reply(mess.only.admin)
+                     if (!isBotGroupAdmins) return reply(mess.only.Badmin)
                  
                  const dataRevoke = JSON.parse(fs.readFileSync('./src/gc-revoked.json'))
                  
@@ -1504,6 +1503,16 @@ break
                  }
                  
                  break
+                 case 'listadmin':
+                    if (!isGroup) return reply(mess.only.group)
+                    teks = `List admin di grup *${groupMetadata.subject}*\nTotal : ${groupAdmins.length}\n\n`
+                    no = 0
+                    for (let admon of groupAdmins) {
+                        no += 1
+                        teks += `[${no.toString()}] @${admon.split('@')[0]}\n`
+                    }
+                    mentions(teks, groupAdmins, true)
+                    break
          case 'blocklist':
                     if (!isOwner) return reply(mess.only.ownerB) 
                      teks = '*This is list of blocked number* :\n'
@@ -1531,24 +1540,25 @@ break
                     if (isBanned) return reply(mess.only.benned)
                      if (!isGroup) return reply(mess.only.group)
                      if (!isGroupAdmins) return reply(mess.only.admin)
+                     if (!isBotGroupAdmins) return reply(mess.only.Badmin)
                      var value = body.slice(9)
-                     var group = await client.groupMetadata(from)
-                     var member = group['participants']
-                     var mem = []
-                     member.map( async adm => {
-                     mem.push(adm.id.replace('c.us', 's.whatsapp.net'))
-                     })
-                     var options = {
-                     text: value,
-                     contextInfo: { mentionedJid: mem },
-                     quoted: mek
-                     }
-                     client.sendMessage(from, options, text)
-                     break
+                    var group = await client.groupMetadata(from)
+                    var member = group['participants']
+                    var mem = []
+                    member.map( async adm => {
+                    mem.push(adm.id.replace('c.us', 's.whatsapp.net'))
+                    })
+                    var options = {
+                    text: value,
+                    contextInfo: { mentionedJid: mem },
+                    quoted: mek
+                    }
+                    client.sendMessage(from, options, text)
+                    break
                  case 'ingfo':  
                  if (isBanned) return reply(mess.only.benned)
-                     if (!isGroup) return reply(`GRUP ONLY`)
-                     if (!isGroupAdmins) return reply(`LU ADMIN??`)
+                     if (!isGroup) return reply(mess.only.group)
+                     if (!isGroupAdmins) return reply(mess.only.admin)
                      var value = body.slice(7)
                      var group = await client.groupMetadata(from)
                      var member = group['participants']
@@ -1605,6 +1615,7 @@ break
                      if (isBanned) return reply(mess.only.benned)
                      if (!isGroup) return reply(mess.only.group)
                      if (!isGroupAdmins) return reply(mess.only.admin)
+                     if (!isBotGroupAdmins) return reply(mess.only.Badmin)
                      if (args.length < 1) return reply('Yang mau di add siapa??')
                      if (args[0].startsWith('08')) return reply('Gunakan kode negara Gan')
                      try {
@@ -1644,6 +1655,7 @@ break
                      if (isBanned) return reply(mess.only.benned)
                      if (!isGroup) return reply(mess.only.group)
                      if (!isGroupAdmins) return reply(mess.only.admin)
+                     if (!isBotGroupAdmins) return reply(mess.only.Badmin)
                      members_id = []
                      teks = (args.length > 1) ? body.slice(8).trim() : ''
                      teks += '\n\n'
@@ -1801,26 +1813,7 @@ break
                          reply('*Suksess broadcast* ')
                      }
                      break
-         case 'bcc': 
-                    if (isBanned) return reply(mess.only.benned)
-                    if (!isAdmin) return reply('*Only Admin bot*')
-                     if (args.length < 1) return reply('.......')
-                     anu = await client.chats.all()
-                     if (isMedia && !mek.message.videoMessage || isQuotedImage) {
-                         const encmedia = isQuotedImage ? JSON.parse(JSON.stringify(mek).replace('quotedM','m')).message.extendedTextMessage.contextInfo : mek
-                         buff = await client.downloadMediaMessage(encmedia)
-                         for (let _ of anu) {
-                             client.sendMessage(_.jid, buff, image, {caption: `*「 PESAN BROADCAST 」*\n\n${body.slice(4)}`})
-                         }
-                         reply('*Suksess broadcast* ')
-                     } else {
-                         for (let _ of anu) {
-                             sendMess(_.jid, `*「 PESAN ${namabot} 」*\n\n${body.slice(4)}`)
-                         }
-                         reply('*Suksess broadcast* ')
-                     }
-                     break
-         case 'setpp': 
+         case 'setppgrup': 
                      if (isBanned) return reply(mess.only.benned)
                      if (!isGroup) return reply(mess.only.group)
                      if (!isGroupAdmins) return reply(mess.only.admin)
@@ -1855,7 +1848,7 @@ break
                      if (!isGroup) return reply(mess.only.group)
                      if (!isGroupAdmins) return reply(mess.only.admin)
                      if (!isBotGroupAdmins) return reply(mess.only.Badmin)
-                     client.groupUpdateSubject(from, `${body.slice(9)}`)
+                     client.groupUpdateSubject(from, `${body.slice(13)}`)
                      client.sendMessage(from, 'Succes, Ganti Nama Grup', text, {quoted: mek})
                      break
              case 'setdescgrup':
@@ -1863,7 +1856,7 @@ break
                      if (!isGroup) return reply(mess.only.group)
                      if (!isGroupAdmins) return reply(mess.only.admin)
                      if (!isBotGroupAdmins) return reply(mess.only.Badmin)
-                     client.groupUpdateDescription(from, `${body.slice(9)}`)
+                     client.groupUpdateDescription(from, `${body.slice(13)}`)
                      client.sendMessage(from, 'Succes, Ganti Deskripsi Grup', text, {quoted: mek})
                      break
              case 'promote':
@@ -1906,6 +1899,13 @@ break
                          client.groupDemoteAdmin(from, mentioned)
                      }
                      break
+                     case 'reply':
+                    if (!isOwner) return reply(mess.only.ownerB)
+                    client.updatePresence(from, Presence.composing) 
+                    if (args.length < 1) return
+                    cr = body.slice(7)
+                    reply(`${cr}`)
+                    break 
              case 'ban':
                  if (isBanned) return reply(mess.only.benned)
                  if (!isOwner) return reply(mess.only.ownerB)
@@ -1920,10 +1920,10 @@ break
                      if (!isOwner) return reply(mess.only.ownerB)
                      if (!isGroup) return reply(mess.only.group)
                      bnnd = body.slice(7)
-				ban.splice(`${bnnd}@s.whatsapp.net`, 1)
-				fs.writeFileSync('./database/pengguna/banned.json', JSON.stringify(ban))
-				reply(`Nomor wa.me/${bnnd} telah di unban!`)
-				break
+                ban.splice(`${bnnd}@s.whatsapp.net`, 1)
+                fs.writeFileSync('./database/pengguna/banned.json', JSON.stringify(ban))
+                reply(`Nomor wa.me/${bnnd} telah di unban!`)
+                break
             case 'bann':
                         if (isBanned) return reply(mess.only.benned)
                         if (!isOwner) return reply(mess.only.ownerB)
@@ -1960,19 +1960,14 @@ break
                      if (mentioned.length > 1) {
                          teks = ''
                          for (let _ of mentioned) {
-                             teks += `╭────────────────⊱
- ║> *_BYE BYE BEBAN GRUB_*
- ╰────────────────⊱
+                             teks += `> *_BYE BYE BEBAN GRUB_*
   🤭 :\n`
                              teks += `@_.split('@')[0]`
                          }
                          mentions(teks, mentioned, true)
                          client.groupRemove(from, mentioned)
                      } else {
-                         mentions(`╭────────────────⊱
- ║> *_BYE BYE BEBAN GRUB_*
- ╰────────────────⊱
-  @${mentioned[0].split('@')[0]} 🤭`, mentioned, true)
+                         mentions(`*_BYE BYE BEBAN GRUB_*\n\n@${mentioned[0].split('@')[0]} 🤭`, mentioned, true)
                          client.groupRemove(from, mentioned)
                      }
                      break
@@ -1980,7 +1975,8 @@ break
                      if (isBanned) return reply(mess.only.benned)
                      if (!isGroup) return reply(mess.only.group)
                      if (!isGroupAdmins) return reply(mess.only.admin)
-                     if (args.length < 1) return reply('Pa Maksud?')
+                     if (!isBotGroupAdmins) return reply(mess.only.Badmin)
+                     if (args.length < 1) return reply('enable/disable')
                  if (args[0] === 'enable') {
                  if (isWelkom) return reply('*fitur Welcome sudah aktif tadi!!*')
                         welkom.push(from)
@@ -2029,33 +2025,36 @@ break
                          fs.unlinkSync(ranm)
                      })
                      break
+                     case 'del':
+                     case 'delete':
+                     client.deleteMessage(from, { id: mek.message.extendedTextMessage.contextInfo.stanzaId, remoteJid: from, fromMe: true })
+                     break
  //DOWNLOAD MENU     
                      case 'fb':
                     if (isBanned) return reply(mess.only.benned)
                      if (args.length == 0) return reply(`*Contoh:* ${prefix + command} https://www.facebook.com/groups/526925218448628/permalink/591475845326898/`)
                      link = args[0]
-                     anu = await fetchJson(`https://api.xteam.xyz/dl/fbv2?url=${link}&APIKEY=${xteamapi}`)
+                     anu = await fetchJson(`https://api.dapuhy.xyz/api/socialmedia/snapsave?url=${link}&apikey=${dapapi}`)
                      anu = anu.result
-                     anu1 = anu.hd
-                     anu2 = await getBuffer(anu1.url)
-                     client.sendMessage(from, anu2, video, {mimetype: 'video/mp4', quoted:mek })
+                     anu1 = await getBuffer(anu.preview)
+                     client.sendMessage(from, anu1, video, {mimetype: 'video/mp4', quoted:mek })
                      break
                      case 'ig':
                      if (isBanned) return reply(mess.only.benned)
                      if (args.length == 0) return reply(`*Contoh:* ${prefix + command} https://www.instagram.com/p/CNGxug9jy3D/`)
                      link = args[0]
-                     anu = await fetchJson(`https://api.dapuhy.xyz/api/socialmedia/igdownload?url=${link}&apikey=${dapapi}`)
-                     anu = anu.result
-                     anu1 = await getBuffer(anu.url)
+                     anu = await fetchJson(`https://api.zekais.com/igdl2?url=${link}&apikey=xIWFufT6`)
+                     anu1 = await getBuffer(anu.result[0].url)
                      client.sendMessage(from, anu1, video, {mimetype: 'video/mp4', quoted:mek })
                      break
                      case 'tiktok':
                      case 'tiktokvideo':
+                     case 'tt':
                      case 't':
                      if (isBanned) return reply(mess.only.benned)
                      if (args.length == 0) return reply(`*Contoh:* ${prefix + command} https://vt.tiktok.com/ZSeMAUJbd/`)
                      link = args[0]
-                     anu = await fetchJson(`http://hadi-api.herokuapp.com/api/tiktok?url=${link}`)
+                     anu = await fetchJson(`https://hadi-api.herokuapp.com/api/tiktok?url=${link}`)
                      anu = anu.result
                      anu1 = anu.video
                      anu2 = await getBuffer(anu1.original)
@@ -2063,11 +2062,10 @@ break
                      break
                      case 'twit':
                      if (isBanned) return reply(mess.only.benned)
-                     if (args.length == 0) return reply(`*Contoh:* ${prefix + command} https://www.instagram.com/p/CNGxug9jy3D/`)
+                     if (args.length == 0) return reply(`*Contoh:* ${prefix + command} https://twitter.com/dekai23/status/1488600754256551941`)
                      link = args[0]
-                     anu = await fetchJson(`https://api.dapuhy.xyz/api/socialmedia/twitter?url=${link}&apikey=${dapapi}`)
-                     anu = anu.download
-                     anu1 = await getBuffer(anu.hd)
+                     anu = await fetchJson(`https://api.zekais.com/twtdl?url=${link}&apikey=xIWFufT6`)
+                     anu1 = await getBuffer(anu.result)
                      client.sendMessage(from, anu1, video, {mimetype: 'video/mp4', quoted:mek })
                      break
                      case 'tiktokmusik':
@@ -2079,100 +2077,51 @@ break
                      link = args[0]
                      anu = await fetchJson(`http://hadi-api.herokuapp.com/api/tiktok?url=${link}`)
                      anu = anu.result
-                     anu1 = anu.video
+                     anu1 = anu.audio_only
                      anu2 = await getBuffer(anu1.original)
-                     client.sendMessage(from, anu2, document, { mimetype: 'audio/mp3',filename: `Tiktok Audio.mp3`, quoted: mek })
+                     client.sendMessage(from, anu2, document, { mimetype: 'audio/mp3',filename: getRandom('.mp3'), quoted: mek })
                      break
                      case 'play':
                      case 'yt':
                      if (isBanned) return reply(mess.only.benned)
                      if (args.length == 0) return reply(`*Contoh:* ${prefix + command} Dj Tie Me Down`)
                      query = args.join(" ")
-                     anu = await fetchJson(`https://api.zeks.me/api/ytplaymp3?apikey=alvianto17&q=${query}`)
-                     anu = anu.result
-                     anu1 = `${anu.title}`
-                     anu2 = await getBuffer(anu.thumbnail)
-                     anu3 = await getBuffer(anu.url_audio)
-                     client.sendMessage(from, anu2, image, { quoted: mek, caption: anu1 })
-                     client.sendMessage(from, anu3, document, { mimetype: 'audio/mp3',filename: `${anu.title}.mp3` , quoted: mek })
+                     anu = await fetchJson(`https://melcanz.com/yts?query=${query}&apikey=TP9oxahL`)
+                     anu1 = await getBuffer(anu.thumb)
+                     anu2 = await getBuffer(anu.audio[0].url)
+                     client.sendMessage(from, anu1, image, { quoted: mek, caption: `${anu.title}` })
+                     client.sendMessage(from, anu2, document, { mimetype: 'audio/mp3',filename: `${anu.title}.mp3` , quoted: mek })
                      break
                      case 'playvideo':
                      case 'ytvideo':
                      if (isBanned) return reply(mess.only.benned)
                      if (args.length == 0) return reply(`*Contoh:* ${prefix + command} Dj Tie Me Down`)
                      query = args.join(" ")
-                     anu = await fetchJson(`https://api.zeks.me/api/ytplaymp4?apikey=alvianto17&q=${query}`)
-                     anu = anu.result
-                     anu1 = `*JUDUL* : ${anu.title}\n`
-                     anu1 += `*SOURCE* : ${anu.source}`
-                     anu2 = await getBuffer(anu.thumbnail)
-                     anu3 = await getBuffer(anu.url_video)
-                     client.sendMessage(from, anu2, image, { quoted: mek, caption: anu1 })
-                     client.sendMessage(from, anu3, video, { mimetype: 'video/mp4', quoted: mek })
+                     anu = await fetchJson(`https://melcanz.com/yts?query=${query}&apikey=TP9oxahL`)
+                     anu1 = await getBuffer(anu.thumb)
+                     anu2 = await getBuffer(anu.video[0].url)
+                     client.sendMessage(from, anu1, image, { quoted: mek, caption: `${anu.title}` })
+                     client.sendMessage(from, anu2, video, { mimetype: 'video/mp4', quoted: mek })
                      break
                      case 'ytmp3':
                         if (isBanned) return reply(mess.only.benned)
                      if (args.length == 0) return reply(`Contoh: ${prefix + command} https://www.youtube.com/watch?v=qZIQAk-BUEc`)
                      link = args[0]
-                     anu = await fetchJson(`http://hadi-api.herokuapp.com/api/yt2/audio?url=${link}`)
-                     anu = anu.result
-                     ini_txt = `Judul : ${anu.title}`
-                     ini_buffer = await getBuffer(anu.thumb)
-                     client.sendMessage(from, ini_buffer, image, { quoted: mek, caption: ini_txt })
-                     get_audio = await getBuffer(anu.download_audio)
-                     client.sendMessage(from, get_audio, document, { mimetype: 'audio/mp3', filename: `${anu.title}.mp3`, quoted: mek})
+                     anu = await fetchJson(`https://melcanz.com/yt?url=${link}&apikey=TP9oxahL`)
+                     anu1 = await getBuffer(anu.thumb)
+                     anu2 = await getBuffer(anu.audio[0].url)
+                     client.sendMessage(from, anu1, image, { quoted: mek, caption: `${anu.title}`})
+                     client.sendMessage(from, anu2, document, { mimetype: 'audio/mp3', filename: `${anu.title}.mp3`, quoted: mek})
                      break
-                     case 'ytmp4':
-                        if (isBanned) return reply(mess.only.benned)
-                     if (args.length == 0) return reply(`*Contoh:* ${prefix + command} https://www.youtube.com/watch?v=d_HlPboLRL8`)
-                     ini_link = args[0]
-                     anu = await fetchJson(`https://api.zeks.me/api/ytmp4?apikey=alvianto17&url=${ini_link}`)
-                     anu = anu.result
-                     ini_txt = `Judul : ${anu.title}`
-                     ini_buffer = await getBuffer(anu.thumbnail)
-                     client.sendMessage(from, ini_buffer, image, { quoted: mek, caption: ini_txt })
-                     get_audio = await getBuffer(anu.url_video)
-                     client.sendMessage(from, get_audio, video, { mimetype: 'video/mp4', filename: `${anu.title}.mp4`, quoted: mek})
-                     break
-                     case 'ytsearch':
-                        if (isBanned) return reply(mess.only.benned)
-                     if (args.length == 0) return reply(`*Contoh:* ${prefix + command} Dj Tie Me Down`)
-                     query = args.join(" ")
-                     get_result = await fetchJson(`https://api.lolhuman.xyz/api/ytsearch?apikey=${lolkey}&query=${query}`)
-                     get_result = get_result.result
-                     ini_txt = ""
-                     for (var x of get_result) {
-                     ini_txt += `Title : ${x.title}\n`
-                     ini_txt += `Views : ${x.views}\n`
-                     ini_txt += `Published : ${x.published}\n`
-                     ini_txt += `Thumbnail : ${x.thumbnail}\n`
-                     ini_txt += `Link : https://www.youtube.com/watch?v=${x.videoId}\n\n`
-                     }
-                     reply(ini_txt)
-                     break
-                     case 'playstore':
-                        if (isBanned) return reply(mess.only.benned)
-                     if (args.length == 0) return reply(`*Contoh:* ${prefix + command} Game Burik`)
-                     query = args.join(" ")
-                     anu = await fetchJson(`https://api.zeks.me/api/sgplay?apikey=alvianto17&q=${query}`)
-                     anu = anu.result
-                     ini_txt = ""
-                     for (var x of anu) {
-                     ini_txt += `Nama Aplikasi: *${x.title}*\n`
-                     ini_txt += `Developer : *${x.developer}*\n`
-                     ini_txt += `Rating Game : *${x.rating}*\n`
-                     ini_txt += `Link : *${x.url}*\n\n`
-                     }
-                     reply(ini_txt)
-                     case 'lirik':
-                        if (isBanned) return reply(mess.only.benned)
-                     if (args.length == 0) return reply(`*Contoh:* ${prefix + command} Resah jadi luka`)
-                     query = args.join(" ")
-                     anu = await fetchJson(`https://hardianto.xyz/api/info/lirik?query=${query}&apikey=hardianto`)
-                     ini_txt = `${anu.lirik}`
-                     thumb = await getBuffer(anu.thumb)
-                     client.sendMessage(from, thumb, image, {caption: ini_txt, quoted: mek})
-                     break
+                    case 'ytmp4':
+                    if (args.length == 0) return reply(`*Contoh:* ${prefix + command} https://www.youtube.com/watch?v=d_HlPboLRL8`)
+                    link = args[0]
+                    anu = await fetchJson(`https://melcanz.com/yt?url=${link}&apikey=TP9oxahL`)
+                    anu1 = await getBuffer(anu.thumb)
+                    client.sendMessage(from, anu1, image, { quoted: mek, caption: `${anu.title}`})
+                    anu2 = await getBuffer(anu.video[0].url)
+                    client.sendMessage(from, anu2, video, { mimetype: 'video/mp4', quoted: mek})
+                    break
  
  //MENU INFORMASI
                      case 'igstalk':
@@ -2225,26 +2174,26 @@ break
                      reply( txt )
                      break
                      case 'gempa':
-                     get_result = await fetchJson(`http://hadi-api.herokuapp.com/api/infogempa`)
+                     get_result = await fetchJson(`https://api.lolhuman.xyz/api/infogempa?apikey=${lolkey}`)
                      get_result = get_result.result
-                     ini_txt = `*Koordinat* : ${get_result.kordinat}\n`
-                     ini_txt += `*Magnitudo* : ${get_result.magnitudo}\n`
+                     ini_txt = `*Koordinat* : ${get_result.koordinat}\n`
+                     ini_txt += `*Magnitudo* : ${get_result.magnitude}\n`
                      ini_txt += `*Kedalaman* : ${get_result.kedalaman}\n`
                      ini_txt += `*Waktu* : ${get_result.waktu}\n`
                      ini_txt += `*Lokasi Gempa* : ${get_result.lokasi}\n`
-                     ini_txt += `*Dirasakan* : ${get_result.dirasakan}\n\n`
+                     ini_txt += `*Dirasakan* : ${get_result.potensi}\n\n`
                      ini_txt += `POWERED BY: BMKG.GO.ID`
-                     anu = await getBuffer(get_result.url_map)
+                     anu = await getBuffer(get_result.map)
                      client.sendMessage(from, anu, image, {quoted: mek, caption: ini_txt })
                      break
                      case 'corona':
                      case 'covid':
-                     get_result = await fetchJson(`https://api.lolhuman.xyz/api/corona/indonesia?apikey=${lolkey}`)
+                     get_result = await fetchJson(`https://restu-restapi.herokuapp.com/covid?country=indonesia`)
                      get_result = get_result.result
                      ini_txt = `*Positif* : ${get_result.positif}\n`
                      ini_txt += `*Sembuh* : ${get_result.sembuh}\n`
-                     ini_txt += `*Dirawat* : ${get_result.dirawat}\n`
-                     ini_txt += `*Meninggal* : ${get_result.meninggal}\n\n\n`
+                     ini_txt += `*Meninggal* : ${get_result.meninggal}\n`
+                     ini_txt += `*Update* : ${get_result.diperbarui}\n\n`
                      ini_txt += '*Data Ini Diambil Dari KEMENTRIAN KESEHATAN RI*'
                      reply( ini_txt )
                      break
@@ -2308,110 +2257,30 @@ break
                      break
  
  //OTHER MENU
-                     case 'artinama':
+                    case 'lirik':
                         if (isBanned) return reply(mess.only.benned)
+                     if (args.length == 0) return reply(`*Contoh:* ${prefix + command} Resah jadi luka`)
                      query = args.join(" ")
-                     anu = await fetchJson(`https://melcanz.com/artinama?nama=${query}&apikey=TP9oxahL`)
-                     txt = `Nama: *${query}*`
-                     txt += `Arti: ${arti}`
-                     reply( txt )
-                     case 'meme':
-                        if (isBanned) return reply(mess.only.benned)
-                     anu = await fetchJson(`https://zahirr-web.herokuapp.com/api/random/meme?apikey=${zahirapi}`)
-                     anu = anu.result
-                     txt = `${anu.title}`
-                     anu1 = await getBuffer(anu.url)
-                     client.sendMessage(from, anu1, image, { quoted: mek, caption: txt })
+                     anu = await fetchJson(`https://hardianto.xyz/api/info/lirik?query=${query}&apikey=hardianto`)
+                     ini_txt = `${anu.lirik}`
+                     thumb = await getBuffer(anu.thumb)
+                     client.sendMessage(from, thumb, image, {caption: ini_txt, quoted: mek})
                      break
-                     case 'tebakgambar':
+                     case 'ppcp':
                         if (isBanned) return reply(mess.only.benned)
-                     anu = await fetchJson(`https://zahirr-web.herokuapp.com/api/kuis/tebakgambar?apikey=${zahirapi}`)
+                     anu = await fetchJson(`https://api-xcoders.xyz/api/random/ppcouple?apikey=b9Kq8rLr3c`)
                      anu = anu.result
-                     anu1 = await getBuffer(anu.images)
-                     anu2 = `➻ *JAWABAN* : ${anu.jawaban}`
-                     setTimeout( () => {
-                     client.sendMessage(from, anu1, image,{caption: 'Jawab Bro... Waktunya 60 Deik', quoted: mek})
-                     }, 1)
-                     setTimeout( () => {
-                     costum('50 Detik lagi', text, tescuk, cr)
-                     }, 10000)                                                                                                                                   
-                     setTimeout( () => {
-                     costum('40 Detik lagi', text, tescuk, cr)
-                     }, 20000)    
-                     setTimeout( () => {
-                     costum('30 Detik lagi', text, tescuk, cr)
-                     }, 30000)    
-                     setTimeout( () => {
-                     costum('20 Detik lagi', text, tescuk, cr)
-                     }, 40000)                                       
-                     setTimeout( () => {
-                     costum('10 Detik lagi', text, tescuk, cr)
-                     }, 50000)                                                                                                                                                     
-                     setTimeout( () => {
-                     client.sendMessage(from, anu2, text,{quoted: mek})                   
-                     }, 60000)                                                                          
-                     break                                                                                                                                           
- 
-                     case 'caklontong':
-                        if (isBanned) return reply(mess.only.benned)
-                     anu = await fetchJson(`https://zahirr-web.herokuapp.com/api/kuis/caklontong?apikey=${zahirapi}`)
-                     anu = anu.result
-                     soal = `${anu.soal}`
-                     anu2 = `➻ *JAWABAN* : ${anu.jawaban}`
-                     setTimeout( () => {
-                     client.sendMessage(from, soal, text,{caption: 'Jawab Bro... Waktunya 60 Deik', quoted: mek})
-                     }, 1)
-                     setTimeout( () => {
-                     costum('50 Detik lagi', text, tescuk, cr)
-                     }, 10000)                                                                                                                                   
-                     setTimeout( () => {
-                     costum('40 Detik lagi', text, tescuk, cr)
-                     }, 20000)    
-                     setTimeout( () => {
-                     costum('30 Detik lagi', text, tescuk, cr)
-                     }, 30000)    
-                     setTimeout( () => {
-                     costum('20 Detik lagi', text, tescuk, cr)
-                     }, 40000)                                       
-                     setTimeout( () => {
-                     costum('10 Detik lagi', text, tescuk, cr)
-                     }, 50000)                                                                                                                                                     
-                     setTimeout( () => {
-                     client.sendMessage(from, anu2, text,{quoted: mek})                   
-                     }, 60000)                                                                          
-                     break
- 
-                     case 'asahotak':
-                        if (isBanned) return reply(mess.only.benned)
-                     anu = await fetchJson(`https://api.dapuhy.xyz/api/fun/asahotak?apikey=${dapapi}`)
-                     soal = `${anu.pertanyaan}`
-                     anu2 = `➻ *JAWABAN* : ${anu.jawaban}`
-                     setTimeout( () => {
-                     client.sendMessage(from, soal, text,{caption: 'Jawab Bro... Waktunya 60 Deik', quoted: mek})
-                     }, 1)
-                     setTimeout( () => {
-                     costum('50 Detik lagi', text, tescuk, cr)
-                     }, 10000)                                                                                                                                   
-                     setTimeout( () => {
-                     costum('40 Detik lagi', text, tescuk, cr)
-                     }, 20000)    
-                     setTimeout( () => {
-                     costum('30 Detik lagi', text, tescuk, cr)
-                     }, 30000)    
-                     setTimeout( () => {
-                     costum('20 Detik lagi', text, tescuk, cr)
-                     }, 40000)                                       
-                     setTimeout( () => {
-                     costum('10 Detik lagi', text, tescuk, cr)
-                     }, 50000)                                                                                                                                                     
-                     setTimeout( () => {
-                     client.sendMessage(from, anu2, text,{quoted: mek})                   
-                     }, 60000)                                                                          
+                     cwo = await getBuffer(anu.ppcwo)
+                     cwe = await getBuffer(anu.ppcwe)
+                     reply(`Tema: ${anu.theme}`)
+                     client.sendMessage(from, cwo, image, {quoted: mek, caption: `Cowo`})
+                     client.sendMessage(from, cwe, image, {quoted: mek, caption: `Cewe`})
                      break
  
  //Spam SMS
                      case 'spamwa':
                      if (!isOwner) return reply(mess.only.ownerB)
+                     if (args.length == 0) return reply(`*Contoh:* ${prefix + command} 62xxxxxxxxxxx`)
                      query = args.join(" ")
                      spam = await fetchJson(`https://api.xteam.xyz/spammer/olx?no=${query}&APIKEY=${xteamapi}`)
                      txt = `${spam.result}`                 
@@ -2419,6 +2288,7 @@ break
                      break
                      case 'spamsms':
                      if (!isOwner) return reply(mess.only.ownerB)
+                     if (args.length == 0) return reply(`*Contoh:* ${prefix + command} 62xxxxxxxxxxx`)
                      query = args.join(" ")
                      spam = await fetchJson(`https://api.xteam.xyz/spammer/icq?no=${query}&APIKEY=${xteamapi}`)
                      txt = `${spam.result}`                 
@@ -2426,12 +2296,15 @@ break
                      break
                      case 'spamtlp':
                      if (!isOwner) return reply(mess.only.ownerB)
+                     if (args.length == 0) return reply(`*Contoh:* ${prefix + command} 8xxxxxxxxxx`)
                      query = args.join(" ")
-                     spam = await fetchJson(`https://api.xteam.xyz/spammer/jagreward?no=${query}&APIKEY=${xteamapi}`)
-                     reply(`Sukses Spam Panggilan Nomer wa.me/${query}`)
+                     spam = await fetchJson(`https://caliphapi.com/api/spamcall?no=${query}&apikey=DmmL8IQZ`)
+                     txt = `${spam.result}`                 
+                     reply(`Sukses Spam WhatsApp Nomer wa.me/62${query}\n\nSN: ${txt}`)
                      break
                      case 'spamall':
                      if (!isOwner) return reply(mess.only.ownerB)
+                     if (args.length == 0) return reply(`*Contoh:* ${prefix + command} 62xxxxxxxxxxx`)
                      query = args.join(" ")
                      spam = await fetchJson(`https://api.xteam.xyz/spammer/pizzahut?no=${query}&APIKEY=${xteamapi}`)
                      spam1 = await fetchJson(`https://api.xteam.xyz/spammer/olx?no=${query}&APIKEY=${xteamapi}`)
@@ -2466,7 +2339,9 @@ break
                          console.log(budy)
                          muehe = await simih(budy)
                          reply(ind.cmdnf(prefix, command))
-                     } else {}
+                     } else {
+                        console.log(color('[ERROR]','red'), 'Unregistered Command from', color(sender.split('@')[0]))
+                     }
                      }
          } catch (e) {
              console.log('Error : %s', color(e, 'red'))
